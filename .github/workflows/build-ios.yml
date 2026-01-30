@@ -58,19 +58,22 @@ jobs:
         run: |
           cd store-packages/ios-project/src
 
-          # Show profile entitlements for debugging
-          echo "=== Provisioning Profile Entitlements ==="
+          # Show profile info for debugging
+          echo "=== Provisioning Profile Info ==="
+          echo "UUID: $PP_UUID"
+          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/$PP_UUID.mobileprovision 2>/dev/null | grep -E "(Name|TeamIdentifier|application-identifier)" | head -10
+          echo "=== Entitlements ==="
           security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/$PP_UUID.mobileprovision 2>/dev/null | grep -A 50 "<key>Entitlements</key>" | head -60
           echo "==="
 
-          # Configure Pods project - completely disable code signing
+          # Configure Pods project - completely disable code signing for all Pods
           if [ -f "Pods/Pods.xcodeproj/project.pbxproj" ]; then
-            # Remove all code signing settings from Pods
             sed -i '' 's/CODE_SIGNING_REQUIRED = YES;/CODE_SIGNING_REQUIRED = NO;/g' Pods/Pods.xcodeproj/project.pbxproj
             sed -i '' 's/CODE_SIGNING_ALLOWED = YES;/CODE_SIGNING_ALLOWED = NO;/g' Pods/Pods.xcodeproj/project.pbxproj
             sed -i '' 's/"CODE_SIGNING_ALLOWED\[sdk=\*\]" = YES;/"CODE_SIGNING_ALLOWED[sdk=*]" = NO;/g' Pods/Pods.xcodeproj/project.pbxproj
             sed -i '' 's/CODE_SIGN_IDENTITY = ".*";/CODE_SIGN_IDENTITY = "";/g' Pods/Pods.xcodeproj/project.pbxproj
             sed -i '' 's/PROVISIONING_PROFILE_SPECIFIER = ".*";/PROVISIONING_PROFILE_SPECIFIER = "";/g' Pods/Pods.xcodeproj/project.pbxproj
+            echo "Disabled code signing for Pods"
           fi
 
       - name: Build iOS App
@@ -78,7 +81,8 @@ jobs:
           TEAM_ID: ${{ secrets.TEAM_ID }}
         run: |
           cd store-packages/ios-project/src
-          # Build - let Xcode find the profile automatically via UUID filename
+          # Build with manual code signing for App Store distribution
+          # PROVISIONING_PROFILE uses UUID, only applies to targets that have code signing enabled
           xcodebuild -workspace "מוקד שרפ.xcworkspace" \
             -scheme "מוקד שרפ" \
             -sdk iphoneos \
@@ -86,8 +90,10 @@ jobs:
             -archivePath $RUNNER_TEMP/MokedSharap.xcarchive \
             archive \
             -destination "generic/platform=iOS" \
-            CODE_SIGN_STYLE="Automatic" \
-            DEVELOPMENT_TEAM="$TEAM_ID"
+            CODE_SIGN_STYLE="Manual" \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            PROVISIONING_PROFILE="$PP_UUID"
 
       - name: Export IPA
         env:
