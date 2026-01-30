@@ -49,3 +49,5 @@ store-packages/ios-project/src/Pods/
 .playwright-mcp/
 *.tmp
 *.temp
+.secrets/
+*.zip
