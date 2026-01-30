@@ -75,28 +75,42 @@ jobs:
           security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/$PP_UUID.mobileprovision 2>/dev/null | grep -E "(Name|TeamIdentifier|application-identifier)" | head -10
           echo "==="
 
+          # Configure main project for manual signing (App Store Distribution)
+          # This only affects the main target, not Pods
+          PROJECT_FILE="מוקד שרפ.xcodeproj/project.pbxproj"
+
+          # Switch to manual signing
+          sed -i '' 's/ProvisioningStyle = Automatic;/ProvisioningStyle = Manual;/g' "$PROJECT_FILE"
+
+          # Set code sign identity to Apple Distribution for Release
+          sed -i '' 's/"CODE_SIGN_IDENTITY\[sdk=iphoneos\*\]" = "iPhone Developer";/"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution";/g' "$PROJECT_FILE"
+          sed -i '' 's/CODE_SIGN_IDENTITY = "iPhone Developer";/CODE_SIGN_IDENTITY = "Apple Distribution";/g' "$PROJECT_FILE"
+          sed -i '' 's/CODE_SIGN_IDENTITY = "Apple Development";/CODE_SIGN_IDENTITY = "Apple Distribution";/g' "$PROJECT_FILE"
+
+          # Set provisioning profile UUID
+          sed -i '' "s/PROVISIONING_PROFILE = \"\";/PROVISIONING_PROFILE = \"$PP_UUID\";/g" "$PROJECT_FILE"
+          sed -i '' "s/PROVISIONING_PROFILE_SPECIFIER = \"\";/PROVISIONING_PROFILE_SPECIFIER = \"\";/g" "$PROJECT_FILE"
+
+          # Set development team
+          sed -i '' "s/DEVELOPMENT_TEAM = \"\";/DEVELOPMENT_TEAM = \"$TEAM_ID\";/g" "$PROJECT_FILE"
+          sed -i '' "s/DEVELOPMENT_TEAM = .*;/DEVELOPMENT_TEAM = \"$TEAM_ID\";/g" "$PROJECT_FILE"
+
+          echo "Configured main project for manual signing with profile UUID: $PP_UUID"
+
       - name: Build iOS App
         env:
           TEAM_ID: ${{ secrets.TEAM_ID }}
-          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
         run: |
           cd store-packages/ios-project/src
-          # Build with automatic signing using API key for authentication
-          # This allows Xcode to resolve profiles automatically
+          # Build without command-line signing overrides
+          # Signing settings are now configured in the project file
           xcodebuild -workspace "מוקד שרפ.xcworkspace" \
             -scheme "מוקד שרפ" \
             -sdk iphoneos \
             -configuration Release \
             -archivePath $RUNNER_TEMP/MokedSharap.xcarchive \
             archive \
-            -destination "generic/platform=iOS" \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath "$HOME/.appstoreconnect/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8" \
-            -authenticationKeyID "$APP_STORE_CONNECT_API_KEY_ID" \
-            -authenticationKeyIssuerID "$APP_STORE_CONNECT_API_ISSUER_ID" \
-            CODE_SIGN_STYLE="Automatic" \
-            DEVELOPMENT_TEAM="$TEAM_ID"
+            -destination "generic/platform=iOS"
 
       - name: Export IPA
         env:
