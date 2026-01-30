@@ -69,10 +69,15 @@ jobs:
         run: |
           cd store-packages/ios-project/src
 
-          # Show profile info for debugging
+          # Show full profile info for debugging
           echo "=== Provisioning Profile Info ==="
           echo "UUID: $PP_UUID"
-          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/$PP_UUID.mobileprovision 2>/dev/null | grep -E "(Name|TeamIdentifier|application-identifier)" | head -10
+          echo ""
+          echo "--- Profile Details ---"
+          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/$PP_UUID.mobileprovision 2>/dev/null | head -100
+          echo ""
+          echo "--- Entitlements ---"
+          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/$PP_UUID.mobileprovision 2>/dev/null | grep -A 50 "<key>Entitlements</key>" | head -60
           echo "==="
 
           PROJECT_FILE="מוקד שרפ.xcodeproj/project.pbxproj"
@@ -130,6 +135,21 @@ jobs:
           TEAM_ID: ${{ secrets.TEAM_ID }}
         run: |
           cd store-packages/ios-project/src
+
+          # Show what profiles are installed
+          echo "=== Installed Profiles ==="
+          ls -la ~/Library/MobileDevice/Provisioning\ Profiles/
+          echo "==="
+
+          # Show build settings for code signing
+          echo "=== Build Settings ==="
+          xcodebuild -workspace "מוקד שרפ.xcworkspace" \
+            -scheme "מוקד שרפ" \
+            -sdk iphoneos \
+            -configuration Release \
+            -showBuildSettings 2>&1 | grep -E "CODE_SIGN|PROVISIONING|DEVELOPMENT_TEAM" | head -20
+          echo "==="
+
           # Build without command-line signing overrides
           # Signing settings are now configured in the project file
           xcodebuild -workspace "מוקד שרפ.xcworkspace" \
