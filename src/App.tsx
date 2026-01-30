@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,6 +7,9 @@ import { ThemeProvider } from "@/components/theme-provider";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import History from "./pages/History";
+import ServiceInfo from "./pages/ServiceInfo";
+import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +22,9 @@ const App = () => (
         <BrowserRouter basename="/emergency-sharap">
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/history" element={<History />} />
+            <Route path="/info" element={<ServiceInfo />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="*" element={<NotFound />} />

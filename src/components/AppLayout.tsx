@@ -1,13 +1,19 @@
 import { useState } from 'react';
 import { Phone } from 'lucide-react';
+import { BottomNav } from './BottomNav';
+import { useCallHistory } from '@/hooks/useCallHistory';
+import { useSettings } from '@/hooks/useSettings';
 
 const APP_LOGO = import.meta.env.BASE_URL + 'logo.png';
 
 // Fixed main contact
+const MAIN_CONTACT_NAME = 'מוקד שרפ';
 const MAIN_CONTACT_NUMBER = '+972732341234';
 
 const AppLayout: React.FC = () => {
   const [callInitiated, setCallInitiated] = useState(false);
+  const { addCall } = useCallHistory();
+  const { settings } = useSettings();
 
   // Helper function to format phone number for tel: link
   const formatPhoneForCall = (number: string) => {
@@ -16,7 +22,7 @@ const AppLayout: React.FC = () => {
 
   // Haptic feedback for native feel
   const triggerHaptic = () => {
-    if ('vibrate' in navigator) {
+    if (settings.enableVibration && 'vibrate' in navigator) {
       navigator.vibrate([50, 30, 50]); // Short vibration pattern
     }
   };
@@ -24,6 +30,10 @@ const AppLayout: React.FC = () => {
   // Handle call - directly trigger phone call
   const handleCallClick = () => {
     triggerHaptic();
+
+    // Log the call to history
+    addCall(MAIN_CONTACT_NAME, MAIN_CONTACT_NUMBER);
+
     const formattedNumber = formatPhoneForCall(MAIN_CONTACT_NUMBER);
     setCallInitiated(true);
     window.location.href = `tel:${formattedNumber}`;
@@ -121,6 +131,9 @@ const AppLayout: React.FC = () => {
           <p style={{ fontSize: 'var(--font-size-xs)' }}>© 2025 מוקד שרפ</p>
         </footer>
       </div>
+
+      {/* Bottom Navigation */}
+      <BottomNav />
     </div>
   );
 };
