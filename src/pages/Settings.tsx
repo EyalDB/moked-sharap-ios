@@ -46,7 +46,7 @@ export default function Settings() {
       </header>
 
       {/* Content */}
-      <main style={{ paddingBottom: 140 }}>
+      <main style={{ paddingBottom: 140, overflowY: 'auto', flex: 1 }}>
         {/* Appearance Section */}
         <div
           style={{

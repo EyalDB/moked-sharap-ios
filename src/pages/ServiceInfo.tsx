@@ -43,7 +43,7 @@ export default function ServiceInfo() {
       </header>
 
       {/* Content */}
-      <main style={{ paddingBottom: 140 }}>
+      <main style={{ paddingBottom: 140, overflowY: 'auto', flex: 1 }}>
         {/* Main Info Card */}
         <div className="info-card">
           <h2 className="info-card-title">
