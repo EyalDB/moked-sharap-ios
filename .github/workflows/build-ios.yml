@@ -44,27 +44,36 @@ jobs:
           # Extract UUID from profile and copy with UUID as filename for auto-detection
           PP_UUID=$(/usr/libexec/PlistBuddy -c "Print UUID" /dev/stdin <<< $(/usr/bin/security cms -D -i $PP_PATH))
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles/$PP_UUID.mobileprovision
+          # Export UUID for use in build step
+          echo "PP_UUID=$PP_UUID" >> $GITHUB_ENV
 
       - name: Install CocoaPods
         run: |
           cd store-packages/ios-project/src
           pod install --repo-update
 
-      - name: Disable Code Signing for Pods
+      - name: Configure Code Signing
+        env:
+          TEAM_ID: ${{ secrets.TEAM_ID }}
         run: |
           cd store-packages/ios-project/src
-          # Disable code signing for all Pods targets to avoid provisioning profile errors
-          sed -i '' 's/CODE_SIGNING_REQUIRED = YES/CODE_SIGNING_REQUIRED = NO/g' Pods/Pods.xcodeproj/project.pbxproj || true
-          sed -i '' 's/CODE_SIGNING_ALLOWED = YES/CODE_SIGNING_ALLOWED = NO/g' Pods/Pods.xcodeproj/project.pbxproj || true
-          # Add CODE_SIGNING_ALLOWED = NO for Pods if not present
-          sed -i '' 's/CODE_SIGN_IDENTITY = ".*"/CODE_SIGN_IDENTITY = ""/g' Pods/Pods.xcodeproj/project.pbxproj || true
+          # Disable code signing for all Pods targets
+          if [ -f "Pods/Pods.xcodeproj/project.pbxproj" ]; then
+            sed -i '' 's/CODE_SIGNING_REQUIRED = YES/CODE_SIGNING_REQUIRED = NO/g' Pods/Pods.xcodeproj/project.pbxproj
+            sed -i '' 's/CODE_SIGNING_ALLOWED = YES/CODE_SIGNING_ALLOWED = NO/g' Pods/Pods.xcodeproj/project.pbxproj
+          fi
+          # Set main app to manual signing with the correct provisioning profile UUID
+          sed -i '' "s/ProvisioningStyle = Automatic;/ProvisioningStyle = Manual;/g" "מוקד שרפ.xcodeproj/project.pbxproj"
+          sed -i '' "s/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g" "מוקד שרפ.xcodeproj/project.pbxproj"
+          # Set the provisioning profile UUID for Release configuration
+          sed -i '' "s/PROVISIONING_PROFILE_SPECIFIER = \"\";/PROVISIONING_PROFILE_SPECIFIER = \"$PP_UUID\";/g" "מוקד שרפ.xcodeproj/project.pbxproj"
 
       - name: Build iOS App
         env:
           TEAM_ID: ${{ secrets.TEAM_ID }}
         run: |
           cd store-packages/ios-project/src
-          # Build with automatic code signing - Xcode will find the installed profile
+          # Build with manual code signing for distribution
           xcodebuild -workspace "מוקד שרפ.xcworkspace" \
             -scheme "מוקד שרפ" \
             -sdk iphoneos \
@@ -74,7 +83,7 @@ jobs:
             -destination "generic/platform=iOS" \
             DEVELOPMENT_TEAM="$TEAM_ID" \
             CODE_SIGN_IDENTITY="Apple Distribution" \
-            -allowProvisioningUpdates
+            PROVISIONING_PROFILE="$PP_UUID"
 
       - name: Export IPA
         env:
