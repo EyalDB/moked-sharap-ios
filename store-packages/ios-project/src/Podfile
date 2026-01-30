@@ -2,8 +2,9 @@
 platform :ios, '15.0'
 
 target 'מוקד שרפ' do
-  # Comment the next line if you don't want to use dynamic frameworks
-  use_frameworks!
+  # Don't use dynamic frameworks - use static libraries to avoid
+  # the Pods umbrella framework which has Hebrew encoding issues in CI
+  # use_frameworks!
 
   # Add the pod for Firebase Cloud Messaging
   pod 'Firebase/Messaging'
