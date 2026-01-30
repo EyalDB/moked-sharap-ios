@@ -100,11 +100,12 @@ jobs:
           content.gsub!(/CODE_SIGN_IDENTITY = "iPhone Developer";/, 'CODE_SIGN_IDENTITY = "Apple Distribution";')
           content.gsub!(/CODE_SIGN_IDENTITY = "";/, 'CODE_SIGN_IDENTITY = "Apple Distribution";')
 
-          # Set provisioning profile UUID (file uses PROVISIONING_PROFILE_SPECIFIER)
-          # For manual signing, we can use the profile UUID directly
-          content.gsub!(/PROVISIONING_PROFILE_SPECIFIER = "";/, "PROVISIONING_PROFILE_SPECIFIER = \"#{pp_uuid}\";")
+          # Set provisioning profile:
+          # - PROVISIONING_PROFILE_SPECIFIER uses the profile NAME
+          # - PROVISIONING_PROFILE uses the UUID
+          content.gsub!(/PROVISIONING_PROFILE_SPECIFIER = "";/, 'PROVISIONING_PROFILE_SPECIFIER = "MokedSharap AppStore";')
 
-          # Add PROVISIONING_PROFILE setting after CODE_SIGN_IDENTITY lines if not present
+          # Add PROVISIONING_PROFILE setting with UUID after CODE_SIGN_IDENTITY lines
           unless content.include?("PROVISIONING_PROFILE = ")
             content.gsub!(/(CODE_SIGN_IDENTITY = "Apple Distribution";)/, "\\1\n\t\t\t\tPROVISIONING_PROFILE = \"#{pp_uuid}\";")
           end
