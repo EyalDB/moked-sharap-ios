@@ -83,7 +83,6 @@ jobs:
           echo "==="
 
           # Use Ruby to modify the project file reliably
-          # Ruby is more reliable for complex plist/pbxproj modifications
           ruby << 'RUBY_SCRIPT'
           require 'fileutils'
 
@@ -93,19 +92,24 @@ jobs:
 
           content = File.read(project_file)
 
-          # Switch to manual provisioning
-          content.gsub!(/ProvisioningStyle = Automatic;/, 'ProvisioningStyle = Manual;')
+          # Switch to manual code signing style (file uses CODE_SIGN_STYLE, not ProvisioningStyle)
+          content.gsub!(/CODE_SIGN_STYLE = Automatic;/, 'CODE_SIGN_STYLE = Manual;')
 
-          # Set code sign identity to Apple Distribution (handles various formats)
-          content.gsub!(/"CODE_SIGN_IDENTITY\[sdk=iphoneos\*\]" = "[^"]*";/, '"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution";')
-          content.gsub!(/CODE_SIGN_IDENTITY = "iPhone Developer";/, 'CODE_SIGN_IDENTITY = "Apple Distribution";')
+          # Set code sign identity to Apple Distribution
           content.gsub!(/CODE_SIGN_IDENTITY = "Apple Development";/, 'CODE_SIGN_IDENTITY = "Apple Distribution";')
+          content.gsub!(/CODE_SIGN_IDENTITY = "iPhone Developer";/, 'CODE_SIGN_IDENTITY = "Apple Distribution";')
           content.gsub!(/CODE_SIGN_IDENTITY = "";/, 'CODE_SIGN_IDENTITY = "Apple Distribution";')
 
-          # Set provisioning profile UUID
-          content.gsub!(/PROVISIONING_PROFILE = "";/, "PROVISIONING_PROFILE = \"#{pp_uuid}\";")
+          # Set provisioning profile UUID (file uses PROVISIONING_PROFILE_SPECIFIER)
+          # For manual signing, we can use the profile UUID directly
+          content.gsub!(/PROVISIONING_PROFILE_SPECIFIER = "";/, "PROVISIONING_PROFILE_SPECIFIER = \"#{pp_uuid}\";")
 
-          # Set development team (replace empty or any value)
+          # Add PROVISIONING_PROFILE setting after CODE_SIGN_IDENTITY lines if not present
+          unless content.include?("PROVISIONING_PROFILE = ")
+            content.gsub!(/(CODE_SIGN_IDENTITY = "Apple Distribution";)/, "\\1\n\t\t\t\tPROVISIONING_PROFILE = \"#{pp_uuid}\";")
+          end
+
+          # Set development team
           content.gsub!(/DEVELOPMENT_TEAM = "";/, "DEVELOPMENT_TEAM = #{team_id};")
           content.gsub!(/DEVELOPMENT_TEAM = [A-Z0-9]+;/, "DEVELOPMENT_TEAM = #{team_id};")
 
