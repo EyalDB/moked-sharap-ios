@@ -43,9 +43,15 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles/
 
+      - name: Install CocoaPods
+        run: |
+          cd store-packages/ios-project/src
+          pod install --repo-update
+
       - name: Build iOS App
         env:
           PROVISIONING_PROFILE_NAME: ${{ secrets.PROVISIONING_PROFILE_NAME }}
+          TEAM_ID: ${{ secrets.TEAM_ID }}
         run: |
           cd store-packages/ios-project/src
           xcodebuild -workspace "מוקד שרפ.xcworkspace" \
@@ -55,6 +61,7 @@ jobs:
             -archivePath $RUNNER_TEMP/MokedSharap.xcarchive \
             archive \
             CODE_SIGN_STYLE=Manual \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
             PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_NAME" \
             CODE_SIGN_IDENTITY="Apple Distribution"
 
