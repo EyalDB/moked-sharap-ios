@@ -1,9 +1,12 @@
 # Uncomment the next line to define a global platform for your project
 platform :ios, '15.0'
 
+# Use modular headers globally for Swift compatibility with static libraries
+use_modular_headers!
+
 target 'מוקד שרפ' do
-  # Don't use dynamic frameworks - use static libraries to avoid
-  # the Pods umbrella framework which has Hebrew encoding issues in CI
+  # Don't use dynamic frameworks - use static libraries with modular headers
+  # to avoid the Pods umbrella framework which has Hebrew encoding issues in CI
   # use_frameworks!
 
   # Add the pod for Firebase Cloud Messaging
