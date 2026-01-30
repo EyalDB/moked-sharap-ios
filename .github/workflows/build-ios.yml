@@ -209,20 +209,33 @@ jobs:
         env:
           TEAM_ID: ${{ secrets.TEAM_ID }}
         run: |
+          # Use app-store-connect method (app-store is deprecated)
+          # Specify the provisioning profile explicitly for the bundle ID
           cat > $RUNNER_TEMP/ExportOptions.plist << EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
           <dict>
               <key>method</key>
-              <string>app-store</string>
+              <string>app-store-connect</string>
               <key>teamID</key>
               <string>$TEAM_ID</string>
               <key>uploadSymbols</key>
               <true/>
+              <key>signingStyle</key>
+              <string>manual</string>
+              <key>provisioningProfiles</key>
+              <dict>
+                  <key>com.yanivcarmel.mokadsharap</key>
+                  <string>MokedSharap AppStore</string>
+              </dict>
           </dict>
           </plist>
           EOF
+
+          echo "=== ExportOptions.plist ==="
+          cat $RUNNER_TEMP/ExportOptions.plist
+          echo "==="
 
           xcodebuild -exportArchive \
             -archivePath $RUNNER_TEMP/MokedSharap.xcarchive \
