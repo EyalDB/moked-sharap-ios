@@ -8,7 +8,7 @@ struct Cookie {
 let gcmMessageIDKey = "00000000000" // update this with actual ID if using Firebase 
 
 // URL for first launch
-let rootUrl = URL(string: "https://projects.elorin.ai/emergency-sharap?v=8")!
+let rootUrl = URL(string: "https://projects.elorin.ai/emergency-sharap?v=9")!
 
 // allowed origin is for what we are sticking to pwa domain
 // This should also appear in Info.plist
