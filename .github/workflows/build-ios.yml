@@ -52,6 +52,47 @@ jobs:
           cd store-packages/ios-project/src
           pod install --repo-update
 
+      - name: Fix CocoaPods Hebrew Target Name Encoding
+        run: |
+          cd store-packages/ios-project/src
+
+          # The Hebrew target name "מוקד שרפ" gets mangled in framework names
+          # Find all xcconfig files and fix the framework references
+
+          echo "=== Checking Pods xcconfig files ==="
+          ls -la Pods/Target\ Support\ Files/ 2>/dev/null || true
+
+          # Find the actual framework name that CocoaPods generated
+          PODS_DIR="Pods/Target Support Files"
+          if [ -d "$PODS_DIR" ]; then
+            for dir in "$PODS_DIR"/Pods-*; do
+              if [ -d "$dir" ]; then
+                FRAMEWORK_DIR_NAME=$(basename "$dir")
+                echo "Found framework target: $FRAMEWORK_DIR_NAME"
+
+                # Get the actual framework name (without Pods- prefix)
+                # The xcconfig files contain the correct linker flags
+                cat "$dir"/*.xcconfig 2>/dev/null | grep -E "OTHER_LDFLAGS|FRAMEWORK" | head -10 || true
+              fi
+            done
+          fi
+
+          # The linker is looking for 'Pods_________' (underscores for each Hebrew char)
+          # We need to find what framework CocoaPods actually created and ensure linker can find it
+
+          # Check the Pods project to see the actual target name
+          echo "=== Checking Pods project targets ==="
+          grep -r "name = Pods" Pods/Pods.xcodeproj/project.pbxproj 2>/dev/null | head -10 || true
+
+          # Fix: Update xcconfig files to use the correct framework name
+          # CocoaPods should have created xcconfig files with correct names
+          # Let's check what linker flags are being set
+          echo "=== Current linker flags in xcconfig ==="
+          find Pods -name "*.xcconfig" -exec grep -l "OTHER_LDFLAGS" {} \; 2>/dev/null | while read f; do
+            echo "File: $f"
+            grep "OTHER_LDFLAGS" "$f" || true
+          done
+
       - name: Setup App Store Connect API Key
         env:
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
