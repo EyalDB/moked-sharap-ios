@@ -46,7 +46,7 @@ export default function Settings() {
       </header>
 
       {/* Content */}
-      <main style={{ paddingBottom: 100 }}>
+      <main style={{ paddingBottom: 140 }}>
         {/* Appearance Section */}
         <div
           style={{

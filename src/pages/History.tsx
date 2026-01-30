@@ -76,7 +76,7 @@ export default function History() {
       </header>
 
       {/* Content */}
-      <main style={{ paddingBottom: 100 }}>
+      <main style={{ paddingBottom: 140 }}>
         {totalCalls === 0 ? (
           <div className="empty-state">
             <div className="empty-state-icon">
