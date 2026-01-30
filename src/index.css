@@ -99,6 +99,51 @@
   --status-info: #2563eb;
 }
 
+/* ===== Dark Theme ===== */
+.dark {
+  /* App Background - Dark */
+  --bg-app-from: #0f172a;
+  --bg-app-via: #1e293b;
+  --bg-app-to: #0f172a;
+
+  /* Surface gradient - Dark */
+  --surface-from: rgba(30, 41, 59, 0.95);
+  --surface-via: rgba(30, 41, 59, 0.98);
+  --surface-to: rgba(15, 23, 42, 0.95);
+  --surface: #1e293b;
+
+  /* Cards & Surfaces - Dark */
+  --bg-card: rgba(30, 41, 59, 0.98);
+  --bg-card-solid: #1e293b;
+  --bg-elevated: #334155;
+  --bg-input: #334155;
+  --bg-hover: rgba(255, 255, 255, 0.06);
+  --bg-active: rgba(255, 255, 255, 0.1);
+
+  /* Text - Light on Dark */
+  --text: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-primary: #f1f5f9;
+
+  /* Borders - Subtle */
+  --border: #475569;
+  --border-strong: #64748b;
+
+  /* Shadows - Darker */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+
+  /* Orbs - Subtle */
+  --orb-1: rgba(220, 38, 38, 0.15);
+  --orb-2: rgba(251, 146, 60, 0.1);
+  --orb-3: rgba(14, 165, 233, 0.08);
+
+  /* Grid */
+  --grid-opacity: 0.05;
+}
+
 /* ===== Base Styles ===== */
 * {
   box-sizing: border-box;
