@@ -75,25 +75,48 @@ jobs:
           security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/$PP_UUID.mobileprovision 2>/dev/null | grep -E "(Name|TeamIdentifier|application-identifier)" | head -10
           echo "==="
 
-          # Configure main project for manual signing (App Store Distribution)
-          # This only affects the main target, not Pods
           PROJECT_FILE="מוקד שרפ.xcodeproj/project.pbxproj"
 
-          # Switch to manual signing
-          sed -i '' 's/ProvisioningStyle = Automatic;/ProvisioningStyle = Manual;/g' "$PROJECT_FILE"
+          # Debug: show current signing settings
+          echo "=== Before modification ==="
+          grep -E "(CODE_SIGN|PROVISIONING|ProvisioningStyle|DEVELOPMENT_TEAM)" "$PROJECT_FILE" | head -30
+          echo "==="
 
-          # Set code sign identity to Apple Distribution for Release
-          sed -i '' 's/"CODE_SIGN_IDENTITY\[sdk=iphoneos\*\]" = "iPhone Developer";/"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution";/g' "$PROJECT_FILE"
-          sed -i '' 's/CODE_SIGN_IDENTITY = "iPhone Developer";/CODE_SIGN_IDENTITY = "Apple Distribution";/g' "$PROJECT_FILE"
-          sed -i '' 's/CODE_SIGN_IDENTITY = "Apple Development";/CODE_SIGN_IDENTITY = "Apple Distribution";/g' "$PROJECT_FILE"
+          # Use Ruby to modify the project file reliably
+          # Ruby is more reliable for complex plist/pbxproj modifications
+          ruby << 'RUBY_SCRIPT'
+          require 'fileutils'
+
+          project_file = "מוקד שרפ.xcodeproj/project.pbxproj"
+          pp_uuid = ENV['PP_UUID']
+          team_id = ENV['TEAM_ID']
+
+          content = File.read(project_file)
+
+          # Switch to manual provisioning
+          content.gsub!(/ProvisioningStyle = Automatic;/, 'ProvisioningStyle = Manual;')
+
+          # Set code sign identity to Apple Distribution (handles various formats)
+          content.gsub!(/"CODE_SIGN_IDENTITY\[sdk=iphoneos\*\]" = "[^"]*";/, '"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution";')
+          content.gsub!(/CODE_SIGN_IDENTITY = "iPhone Developer";/, 'CODE_SIGN_IDENTITY = "Apple Distribution";')
+          content.gsub!(/CODE_SIGN_IDENTITY = "Apple Development";/, 'CODE_SIGN_IDENTITY = "Apple Distribution";')
+          content.gsub!(/CODE_SIGN_IDENTITY = "";/, 'CODE_SIGN_IDENTITY = "Apple Distribution";')
 
           # Set provisioning profile UUID
-          sed -i '' "s/PROVISIONING_PROFILE = \"\";/PROVISIONING_PROFILE = \"$PP_UUID\";/g" "$PROJECT_FILE"
-          sed -i '' "s/PROVISIONING_PROFILE_SPECIFIER = \"\";/PROVISIONING_PROFILE_SPECIFIER = \"\";/g" "$PROJECT_FILE"
+          content.gsub!(/PROVISIONING_PROFILE = "";/, "PROVISIONING_PROFILE = \"#{pp_uuid}\";")
 
-          # Set development team
-          sed -i '' "s/DEVELOPMENT_TEAM = \"\";/DEVELOPMENT_TEAM = \"$TEAM_ID\";/g" "$PROJECT_FILE"
-          sed -i '' "s/DEVELOPMENT_TEAM = .*;/DEVELOPMENT_TEAM = \"$TEAM_ID\";/g" "$PROJECT_FILE"
+          # Set development team (replace empty or any value)
+          content.gsub!(/DEVELOPMENT_TEAM = "";/, "DEVELOPMENT_TEAM = #{team_id};")
+          content.gsub!(/DEVELOPMENT_TEAM = [A-Z0-9]+;/, "DEVELOPMENT_TEAM = #{team_id};")
+
+          File.write(project_file, content)
+          puts "Project file modified successfully"
+          RUBY_SCRIPT
+
+          # Debug: show signing settings after modification
+          echo "=== After modification ==="
+          grep -E "(CODE_SIGN|PROVISIONING|ProvisioningStyle|DEVELOPMENT_TEAM)" "$PROJECT_FILE" | head -30
+          echo "==="
 
           echo "Configured main project for manual signing with profile UUID: $PP_UUID"
 
