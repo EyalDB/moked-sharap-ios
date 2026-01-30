@@ -97,7 +97,7 @@ jobs:
 
           content = File.read(project_file)
 
-          # Switch to manual code signing style (file uses CODE_SIGN_STYLE, not ProvisioningStyle)
+          # Switch to manual code signing style
           content.gsub!(/CODE_SIGN_STYLE = Automatic;/, 'CODE_SIGN_STYLE = Manual;')
 
           # Set code sign identity to Apple Distribution
@@ -105,14 +105,16 @@ jobs:
           content.gsub!(/CODE_SIGN_IDENTITY = "iPhone Developer";/, 'CODE_SIGN_IDENTITY = "Apple Distribution";')
           content.gsub!(/CODE_SIGN_IDENTITY = "";/, 'CODE_SIGN_IDENTITY = "Apple Distribution";')
 
-          # Set provisioning profile:
-          # - PROVISIONING_PROFILE_SPECIFIER uses the profile NAME
-          # - PROVISIONING_PROFILE uses the UUID
+          # Add CODE_SIGN_IDENTITY after CODE_SIGN_STYLE if not already present
+          # This handles configs that have CODE_SIGN_STYLE but no CODE_SIGN_IDENTITY
+          content.gsub!(/(CODE_SIGN_STYLE = Manual;)(?!\n\t*CODE_SIGN_IDENTITY)/, "\\1\n\t\t\t\tCODE_SIGN_IDENTITY = \"Apple Distribution\";")
+
+          # Set provisioning profile specifier (uses profile NAME)
           content.gsub!(/PROVISIONING_PROFILE_SPECIFIER = "";/, 'PROVISIONING_PROFILE_SPECIFIER = "MokedSharap AppStore";')
 
-          # Add PROVISIONING_PROFILE setting with UUID after CODE_SIGN_IDENTITY lines
-          unless content.include?("PROVISIONING_PROFILE = ")
-            content.gsub!(/(CODE_SIGN_IDENTITY = "Apple Distribution";)/, "\\1\n\t\t\t\tPROVISIONING_PROFILE = \"#{pp_uuid}\";")
+          # Add PROVISIONING_PROFILE and PROVISIONING_PROFILE_SPECIFIER after CODE_SIGN_IDENTITY if missing
+          content.gsub!(/(CODE_SIGN_IDENTITY = "Apple Distribution";)(?!\n\t*PROVISIONING_PROFILE)/) do |match|
+            "#{match}\n\t\t\t\tPROVISIONING_PROFILE = \"#{pp_uuid}\";\n\t\t\t\tPROVISIONING_PROFILE_SPECIFIER = \"MokedSharap AppStore\";"
           end
 
           # Set development team
