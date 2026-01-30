@@ -56,42 +56,55 @@ jobs:
         run: |
           cd store-packages/ios-project/src
 
-          # The Hebrew target name "מוקד שרפ" gets mangled in framework names
-          # Find all xcconfig files and fix the framework references
+          # The Hebrew target name "מוקד שרפ" gets mangled when crossing between different environments
+          # The project file has "Pods_מוקדשרפ.framework" but CI generates something different
 
-          echo "=== Checking Pods xcconfig files ==="
-          ls -la Pods/Target\ Support\ Files/ 2>/dev/null || true
-
-          # Find the actual framework name that CocoaPods generated
-          PODS_DIR="Pods/Target Support Files"
-          if [ -d "$PODS_DIR" ]; then
-            for dir in "$PODS_DIR"/Pods-*; do
-              if [ -d "$dir" ]; then
-                FRAMEWORK_DIR_NAME=$(basename "$dir")
-                echo "Found framework target: $FRAMEWORK_DIR_NAME"
-
-                # Get the actual framework name (without Pods- prefix)
-                # The xcconfig files contain the correct linker flags
-                cat "$dir"/*.xcconfig 2>/dev/null | grep -E "OTHER_LDFLAGS|FRAMEWORK" | head -10 || true
-              fi
-            done
+          echo "=== Finding actual Pods framework name ==="
+          # Find the Pods target directory created by CocoaPods
+          PODS_TARGET_DIR=$(ls -d Pods/Target\ Support\ Files/Pods-* 2>/dev/null | head -1)
+          if [ -n "$PODS_TARGET_DIR" ]; then
+            PODS_TARGET_NAME=$(basename "$PODS_TARGET_DIR")
+            # Convert to framework name: "Pods-מוקד שרפ" -> "Pods_מוקד_שרפ"
+            FRAMEWORK_NAME=$(echo "$PODS_TARGET_NAME" | sed 's/Pods-/Pods_/' | sed 's/ /_/g')
+            echo "Pods target directory: $PODS_TARGET_DIR"
+            echo "Expected framework name: $FRAMEWORK_NAME"
           fi
 
-          # The linker is looking for 'Pods_________' (underscores for each Hebrew char)
-          # We need to find what framework CocoaPods actually created and ensure linker can find it
+          # Check Pods project for actual product name
+          echo "=== Checking Pods project for actual framework name ==="
+          grep -E "PRODUCT_NAME|productName" Pods/Pods.xcodeproj/project.pbxproj 2>/dev/null | grep -i pod | head -10 || true
 
-          # Check the Pods project to see the actual target name
-          echo "=== Checking Pods project targets ==="
-          grep -r "name = Pods" Pods/Pods.xcodeproj/project.pbxproj 2>/dev/null | head -10 || true
+          # Remove the explicit Pods framework from the project's Link Frameworks phase
+          # The xcconfig already provides the correct linking via OTHER_LDFLAGS
+          PROJECT_FILE="מוקד שרפ.xcodeproj/project.pbxproj"
 
-          # Fix: Update xcconfig files to use the correct framework name
-          # CocoaPods should have created xcconfig files with correct names
-          # Let's check what linker flags are being set
-          echo "=== Current linker flags in xcconfig ==="
-          find Pods -name "*.xcconfig" -exec grep -l "OTHER_LDFLAGS" {} \; 2>/dev/null | while read f; do
-            echo "File: $f"
-            grep "OTHER_LDFLAGS" "$f" || true
-          done
+          echo "=== Removing explicit Pods framework linkage ==="
+          # The project file has references like "Pods_מוקדשרפ.framework" which gets mangled
+          # We'll remove these and rely on xcconfig linking instead
+
+          ruby << 'RUBY_SCRIPT'
+          project_file = "מוקד שרפ.xcodeproj/project.pbxproj"
+          content = File.read(project_file)
+
+          # Remove the Pods framework from the build file section
+          # E1E260C850014D6B34B487B0 /* Pods_מוקדשרפ.framework in Frameworks */
+          content.gsub!(/^\s*E1E260C850014D6B34B487B0[^\n]*\n/, '')
+
+          # Remove from the frameworks build phase
+          content.gsub!(/^\s*E1E260C850014D6B34B487B0[^\n]*,\n/, '')
+
+          # Remove the file reference line
+          content.gsub!(/^\s*BE9D7FFB2FBE6EEBCA807B6A[^\n]*Pods_[^\n]*\n/, '')
+
+          # Remove from PBXGroup children (the Frameworks group)
+          content.gsub!(/^\s*BE9D7FFB2FBE6EEBCA807B6A[^\n]*,\n/, '')
+
+          File.write(project_file, content)
+          puts "Removed explicit Pods framework linkage from project file"
+          RUBY_SCRIPT
+
+          echo "=== Verifying Pods framework removed ==="
+          grep -i "Pods_" "$PROJECT_FILE" | head -10 || echo "No Pods_ framework references found (good!)"
 
       - name: Setup App Store Connect API Key
         env:
