@@ -33,27 +33,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // [END register_for_notifications]
 
-        // Initialize Siri Shortcuts
-        SiriShortcuts.shared.donateInteraction()
+        // Initialize Siri Shortcuts (disabled - class not implemented)
+        // SiriShortcuts.shared.donateInteraction()
 
-        // Request notification permission and schedule daily reminder
-        LocalNotifications.shared.requestPermission { granted in
-            if granted {
-                LocalNotifications.shared.scheduleDailyReminder(hour: 9, minute: 0)
-            }
-        }
+        // Request notification permission and schedule daily reminder (disabled - class not implemented)
+        // LocalNotifications.shared.requestPermission { granted in
+        //     if granted {
+        //         LocalNotifications.shared.scheduleDailyReminder(hour: 9, minute: 0)
+        //     }
+        // }
 
         return true
       }
 
-    // Handle Siri Shortcuts
-    func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
-        if userActivity.activityType == SiriShortcuts.activityType {
-            SiriShortcuts.handleShortcut()
-            return true
-        }
-        return false
-    }
+    // Handle Siri Shortcuts (disabled - class not implemented)
+    // func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+    //     if userActivity.activityType == SiriShortcuts.activityType {
+    //         SiriShortcuts.handleShortcut()
+    //         return true
+    //     }
+    //     return false
+    // }
 
       // [START receive_message]
       func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) {
