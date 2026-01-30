@@ -41,29 +41,40 @@ jobs:
           PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
           echo -n "$PROVISIONING_PROFILE_BASE64" | base64 --decode -o $PP_PATH
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles/
+          # Extract UUID from profile and copy with UUID as filename for auto-detection
+          PP_UUID=$(/usr/libexec/PlistBuddy -c "Print UUID" /dev/stdin <<< $(/usr/bin/security cms -D -i $PP_PATH))
+          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles/$PP_UUID.mobileprovision
 
       - name: Install CocoaPods
         run: |
           cd store-packages/ios-project/src
           pod install --repo-update
 
+      - name: Disable Code Signing for Pods
+        run: |
+          cd store-packages/ios-project/src
+          # Disable code signing for all Pods targets to avoid provisioning profile errors
+          sed -i '' 's/CODE_SIGNING_REQUIRED = YES/CODE_SIGNING_REQUIRED = NO/g' Pods/Pods.xcodeproj/project.pbxproj || true
+          sed -i '' 's/CODE_SIGNING_ALLOWED = YES/CODE_SIGNING_ALLOWED = NO/g' Pods/Pods.xcodeproj/project.pbxproj || true
+          # Add CODE_SIGNING_ALLOWED = NO for Pods if not present
+          sed -i '' 's/CODE_SIGN_IDENTITY = ".*"/CODE_SIGN_IDENTITY = ""/g' Pods/Pods.xcodeproj/project.pbxproj || true
+
       - name: Build iOS App
         env:
-          PROVISIONING_PROFILE_NAME: ${{ secrets.PROVISIONING_PROFILE_NAME }}
           TEAM_ID: ${{ secrets.TEAM_ID }}
         run: |
           cd store-packages/ios-project/src
+          # Build with automatic code signing - Xcode will find the installed profile
           xcodebuild -workspace "מוקד שרפ.xcworkspace" \
             -scheme "מוקד שרפ" \
             -sdk iphoneos \
             -configuration Release \
             -archivePath $RUNNER_TEMP/MokedSharap.xcarchive \
             archive \
-            CODE_SIGN_STYLE=Manual \
+            -destination "generic/platform=iOS" \
             DEVELOPMENT_TEAM="$TEAM_ID" \
-            PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_NAME" \
-            CODE_SIGN_IDENTITY="Apple Distribution"
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            -allowProvisioningUpdates
 
       - name: Export IPA
         env:
