@@ -17,7 +17,8 @@ func createWebView(container: UIView, WKSMH: WKScriptMessageHandler, WKND: WKNav
 
     config.userContentController = userContentController
 
-    config.limitsNavigationsToAppBoundDomains = true;
+    // Disabled for local file loading - app bound domains only work with remote URLs
+    config.limitsNavigationsToAppBoundDomains = false;
     config.allowsInlineMediaPlayback = true
     config.preferences.javaScriptCanOpenWindowsAutomatically = true
     config.preferences.setValue(true, forKey: "standalone")

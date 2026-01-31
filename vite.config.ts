@@ -10,6 +10,18 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
+  build: {
+    // Disable crossorigin attribute for iOS local file loading
+    modulePreload: {
+      polyfill: false
+    },
+    rollupOptions: {
+      output: {
+        // Don't add crossorigin to script/link tags
+        experimentalMinChunkSize: 0
+      }
+    }
+  },
   plugins: [
     react(),
     VitePWA({
