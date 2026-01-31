@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, HashRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -13,13 +13,19 @@ import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient();
 
+// Use HashRouter for iOS (file:// protocol), BrowserRouter for web
+const isIOS =
+  import.meta.env.MODE === "ios" || window.location.protocol === "file:";
+const Router = isIOS ? HashRouter : BrowserRouter;
+const routerProps = isIOS ? {} : { basename: "/emergency-sharap" };
+
 const App = () => (
   <ThemeProvider defaultTheme="light">
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter basename="/emergency-sharap">
+        <Router {...routerProps}>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/history" element={<History />} />
@@ -29,7 +35,7 @@ const App = () => (
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </BrowserRouter>
+        </Router>
       </TooltipProvider>
     </QueryClientProvider>
   </ThemeProvider>

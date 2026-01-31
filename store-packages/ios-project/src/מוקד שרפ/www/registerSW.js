@@ -1,1 +1,2 @@
-if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/emergency-sharap/sw.js', { scope: '/emergency-sharap/' })})}
+// Service workers disabled for iOS native app (file:// protocol)
+// PWA features only work in web browser context
