@@ -6,15 +6,74 @@ import UniformTypeIdentifiers
 /// This solves the WKWebView CORS issues with file:// protocol
 class LocalAssetHandler: NSObject, WKURLSchemeHandler {
 
+    private var wwwFolderPath: String?
+
+    override init() {
+        super.init()
+        // Find the www folder on initialization
+        wwwFolderPath = findWWWFolder()
+        print("LocalAssetHandler: Initialized with www path: \(wwwFolderPath ?? "NOT FOUND")")
+    }
+
+    private func findWWWFolder() -> String? {
+        let bundle = Bundle.main
+
+        print("LocalAssetHandler: Bundle path: \(bundle.bundlePath)")
+
+        // Try different ways to find the www folder
+
+        // Method 1: Direct path in bundle
+        let directPath = bundle.bundlePath + "/www"
+        if FileManager.default.fileExists(atPath: directPath) {
+            print("LocalAssetHandler: Found www at direct path: \(directPath)")
+            return directPath
+        }
+
+        // Method 2: Using Bundle.main.url
+        if let wwwURL = bundle.url(forResource: "www", withExtension: nil) {
+            print("LocalAssetHandler: Found www via Bundle.url: \(wwwURL.path)")
+            return wwwURL.path
+        }
+
+        // Method 3: Using Bundle.main.path
+        if let wwwPath = bundle.path(forResource: "www", ofType: nil) {
+            print("LocalAssetHandler: Found www via Bundle.path: \(wwwPath)")
+            return wwwPath
+        }
+
+        // Method 4: Search in bundle resource path
+        if let resourcePath = bundle.resourcePath {
+            let resourceWWW = resourcePath + "/www"
+            if FileManager.default.fileExists(atPath: resourceWWW) {
+                print("LocalAssetHandler: Found www in resourcePath: \(resourceWWW)")
+                return resourceWWW
+            }
+        }
+
+        // Debug: List bundle contents
+        print("LocalAssetHandler: www folder NOT FOUND. Listing bundle contents:")
+        do {
+            let contents = try FileManager.default.contentsOfDirectory(atPath: bundle.bundlePath)
+            for item in contents {
+                print("  - \(item)")
+            }
+        } catch {
+            print("LocalAssetHandler: Error listing bundle: \(error)")
+        }
+
+        return nil
+    }
+
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
         guard let url = urlSchemeTask.request.url else {
+            print("LocalAssetHandler: Invalid URL in request")
             urlSchemeTask.didFailWithError(NSError(domain: "LocalAssetHandler", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"]))
             return
         }
 
+        print("LocalAssetHandler: Request for URL: \(url.absoluteString)")
+
         // Get the file path from the custom scheme
-        // "app://localhost/index.html" -> "index.html"
-        // "app://localhost/assets/index.js" -> "assets/index.js"
         var filePath = url.path
 
         // Remove leading slash
@@ -27,20 +86,45 @@ class LocalAssetHandler: NSObject, WKURLSchemeHandler {
             filePath = "index.html"
         }
 
-        // Find the file in the www subdirectory of the bundle
-        let wwwPath = Bundle.main.bundlePath + "/www/" + filePath
-        let fileURL = URL(fileURLWithPath: wwwPath)
+        print("LocalAssetHandler: Resolved file path: \(filePath)")
+
+        // Check if we have a valid www folder
+        guard let wwwPath = wwwFolderPath else {
+            print("LocalAssetHandler: ERROR - www folder not found in bundle!")
+            urlSchemeTask.didFailWithError(NSError(domain: "LocalAssetHandler", code: -3, userInfo: [NSLocalizedDescriptionKey: "www folder not found in bundle"]))
+            return
+        }
+
+        // Build full file path
+        let fullPath = wwwPath + "/" + filePath
+
+        print("LocalAssetHandler: Full path: \(fullPath)")
 
         // Check if file exists
-        guard FileManager.default.fileExists(atPath: wwwPath) else {
-            print("LocalAssetHandler: File not found - \(wwwPath)")
+        guard FileManager.default.fileExists(atPath: fullPath) else {
+            print("LocalAssetHandler: File NOT FOUND at: \(fullPath)")
+
+            // List www folder contents for debugging
+            do {
+                let contents = try FileManager.default.contentsOfDirectory(atPath: wwwPath)
+                print("LocalAssetHandler: Contents of www folder:")
+                for item in contents {
+                    print("  - \(item)")
+                }
+            } catch {
+                print("LocalAssetHandler: Error listing www: \(error)")
+            }
+
             urlSchemeTask.didFailWithError(NSError(domain: "LocalAssetHandler", code: -2, userInfo: [NSLocalizedDescriptionKey: "File not found: \(filePath)"]))
             return
         }
 
         do {
+            let fileURL = URL(fileURLWithPath: fullPath)
             let data = try Data(contentsOf: fileURL)
             let mimeType = getMimeType(forFileAt: fileURL)
+
+            print("LocalAssetHandler: Serving \(filePath) (\(data.count) bytes, \(mimeType))")
 
             // Create response with proper headers
             let response = HTTPURLResponse(
