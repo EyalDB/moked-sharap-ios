@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		25D3517F267A48E0002E5DC0 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 25D3517E267A48E0002E5DC0 /* GoogleService-Info.plist */; };
+		WWWFOLDER00000000000002 /* www in Resources */ = {isa = PBXBuildFile; fileRef = WWWFOLDER00000000000001 /* www */; };
 		595F23A525CEFBFE0053416C /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 595F239A25CEFBFD0053416C /* Settings.swift */; };
 		595F23A625CEFBFE0053416C /* Entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 595F239B25CEFBFD0053416C /* Entitlements */; };
 		595F23A725CEFBFE0053416C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 595F239C25CEFBFD0053416C /* Assets.xcassets */; };
@@ -24,6 +25,7 @@
 
 /* Begin PBXFileReference section */
 		25D3517E267A48E0002E5DC0 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "מוקד שרפ/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		WWWFOLDER00000000000001 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = "מוקד שרפ/www"; sourceTree = "<group>"; };
 		4C1C2162A8048FDF52B2A9D0 /* Pods-מוקד שרפ.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-מוקד שרפ.release.xcconfig"; path = "Target Support Files/Pods-מוקד שרפ/Pods-מוקד שרפ.release.xcconfig"; sourceTree = "<group>"; };
 		59333BAA25CFF706003392A4 /* מוקדשרפ.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "מוקדשרפ.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		595F239A25CEFBFD0053416C /* Settings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Settings.swift; path = "מוקד שרפ/Settings.swift"; sourceTree = "<group>"; };
@@ -87,6 +89,7 @@
 				CDC0FE272388222B002C8D56 /* LaunchScreen.storyboard */,
 				CDC0FE252388222B002C8D56 /* Main.storyboard */,
 				595F23A425CEFBFE0053416C /* WebView.swift */,
+				WWWFOLDER00000000000001 /* www */,
 				30FCACC6A7BF53CD6D9CF6C0 /* Pods */,
 				90E46E861CB86F5FAF46BED9 /* Frameworks */,
 				59333BAA25CFF706003392A4 /* מוקדשרפ.app */,
@@ -159,6 +162,7 @@
 				CDC0FE2A2388222C002C8D56 /* LaunchScreen.storyboard in Resources */,
 				595F23A725CEFBFE0053416C /* Assets.xcassets in Resources */,
 				25D3517F267A48E0002E5DC0 /* GoogleService-Info.plist in Resources */,
+				WWWFOLDER00000000000002 /* www in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -372,7 +376,7 @@
 				CODE_SIGN_ENTITLEMENTS = "מוקד שרפ/Entitlements/Entitlements.plist";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "מוקד שרפ/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -381,7 +385,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.yanivcarmel.mokadsharap";
 				PRODUCT_NAME = "מוקדשרפ";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -400,7 +404,7 @@
 				CLANG_ENABLE_MODULES = NO;
 				CODE_SIGN_ENTITLEMENTS = "מוקד שרפ/Entitlements/Entitlements.plist";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "מוקד שרפ/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -409,7 +413,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.yanivcarmel.mokadsharap";
 				PRODUCT_NAME = "מוקדשרפ";
 				SUPPORTS_MACCATALYST = YES;
