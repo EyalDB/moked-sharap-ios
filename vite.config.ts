@@ -21,9 +21,18 @@ export default defineConfig(({ mode }) => {
         polyfill: false,
       },
       rollupOptions: {
-        output: {
-          experimentalMinChunkSize: 0,
-        },
+        output: isIOS
+          ? {
+              // IIFE format for iOS - works with file:// URLs (no CORS issues)
+              format: "iife",
+              inlineDynamicImports: true,
+              entryFileNames: "assets/[name].js",
+              chunkFileNames: "assets/[name].js",
+              assetFileNames: "assets/[name].[ext]",
+            }
+          : {
+              experimentalMinChunkSize: 0,
+            },
       },
     },
     plugins: [
