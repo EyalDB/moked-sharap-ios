@@ -124,7 +124,13 @@ class ViewController: UIViewController, WKNavigationDelegate, UIDocumentInteract
     }
     
     @objc func loadRootUrl() {
-        מוקדשרפ.webView.load(URLRequest(url: SceneDelegate.universalLinkToLaunch ?? SceneDelegate.shortcutLinkToLaunch ?? rootUrl))
+        // Load bundled www/index.html for complete offline support
+        if let wwwPath = Bundle.main.path(forResource: "www", ofType: nil),
+           let indexPath = Bundle.main.path(forResource: "index", ofType: "html", inDirectory: "www") {
+            let indexURL = URL(fileURLWithPath: indexPath)
+            let wwwURL = URL(fileURLWithPath: wwwPath)
+            מוקדשרפ.webView.loadFileURL(indexURL, allowingReadAccessTo: wwwURL)
+        }
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!){
