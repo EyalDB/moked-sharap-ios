@@ -61,11 +61,8 @@ func setAppStoreAsReferrer(contentController: WKUserContentController) {
 }
 
 func setCustomCookie(webView: WKWebView) {
-    // Skip cookie setting for local file URLs
-    guard let host = rootUrl.host else { return }
-
     let _platformCookie = HTTPCookie(properties: [
-        .domain: host,
+        .domain: rootUrl.host!,
         .path: "/",
         .name: platformCookie.name,
         .value: platformCookie.value,

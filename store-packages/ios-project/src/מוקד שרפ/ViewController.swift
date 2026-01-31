@@ -124,13 +124,7 @@ class ViewController: UIViewController, WKNavigationDelegate, UIDocumentInteract
     }
     
     @objc func loadRootUrl() {
-        // Load from local bundled files (offline-first)
-        if let localUrl = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "www") {
-            מוקדשרפ.webView.loadFileURL(localUrl, allowingReadAccessTo: localUrl.deletingLastPathComponent())
-        } else {
-            // Fallback to remote URL if local files not found
-            מוקדשרפ.webView.load(URLRequest(url: SceneDelegate.universalLinkToLaunch ?? SceneDelegate.shortcutLinkToLaunch ?? rootUrl))
-        }
+        מוקדשרפ.webView.load(URLRequest(url: SceneDelegate.universalLinkToLaunch ?? SceneDelegate.shortcutLinkToLaunch ?? rootUrl))
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!){
