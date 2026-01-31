@@ -124,13 +124,11 @@ class ViewController: UIViewController, WKNavigationDelegate, UIDocumentInteract
     }
     
     @objc func loadRootUrl() {
-        // Load bundled www/index.html for complete offline support
-        if let wwwPath = Bundle.main.path(forResource: "www", ofType: nil),
-           let indexPath = Bundle.main.path(forResource: "index", ofType: "html", inDirectory: "www") {
-            let indexURL = URL(fileURLWithPath: indexPath)
-            let wwwURL = URL(fileURLWithPath: wwwPath)
-            מוקדשרפ.webView.loadFileURL(indexURL, allowingReadAccessTo: wwwURL)
-        }
+        // Load bundled www/index.html using custom URL scheme
+        // This solves WKWebView CORS issues with file:// protocol
+        let url = URL(string: "app://localhost/index.html")!
+        let request = URLRequest(url: url)
+        מוקדשרפ.webView.load(request)
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!){

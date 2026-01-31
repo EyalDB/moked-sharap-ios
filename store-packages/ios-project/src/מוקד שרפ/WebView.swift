@@ -4,6 +4,9 @@ import AuthenticationServices
 import SafariServices
 
 
+// Shared instance of the local asset handler
+let localAssetHandler = LocalAssetHandler()
+
 func createWebView(container: UIView, WKSMH: WKScriptMessageHandler, WKND: WKNavigationDelegate, NSO: NSObject, VC: ViewController) -> WKWebView{
 
     let config = WKWebViewConfiguration()
@@ -16,6 +19,10 @@ func createWebView(container: UIView, WKSMH: WKScriptMessageHandler, WKND: WKNav
     userContentController.add(WKSMH, name: "push-token")
 
     config.userContentController = userContentController
+
+    // Register custom URL scheme handler for loading local assets
+    // This solves the WKWebView CORS issues with file:// protocol
+    config.setURLSchemeHandler(localAssetHandler, forURLScheme: "app")
 
     // Disabled for local file loading - app bound domains only work with remote URLs
     config.limitsNavigationsToAppBoundDomains = false;
@@ -116,6 +123,10 @@ extension ViewController: WKUIDelegate, WKDownloadDelegate {
     }
     // restrict navigation to target host, open external links in 3rd party apps
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        // Allow custom app:// scheme for local assets
+        if (navigationAction.request.url?.scheme == "app") {
+            return decisionHandler(.allow)
+        }
         if (navigationAction.request.url?.scheme == "about") {
             return decisionHandler(.allow)
         }

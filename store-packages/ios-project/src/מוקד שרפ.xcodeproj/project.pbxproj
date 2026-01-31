@@ -18,6 +18,7 @@
 		595F23AD25CEFBFE0053416C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 595F23A225CEFBFE0053416C /* AppDelegate.swift */; };
 		595F23AE25CEFBFE0053416C /* Printer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 595F23A325CEFBFE0053416C /* Printer.swift */; };
 		595F23AF25CEFBFE0053416C /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 595F23A425CEFBFE0053416C /* WebView.swift */; };
+		A1B2C3D4E5F6A78900123458 /* LocalAssetHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A78900123459 /* LocalAssetHandler.swift */; };
 		CDC0FE292388222C002C8D56 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CDC0FE252388222B002C8D56 /* Main.storyboard */; };
 		CDC0FE2A2388222C002C8D56 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CDC0FE272388222B002C8D56 /* LaunchScreen.storyboard */; };
 		E1E260C850014D6B34B487B0 /* Pods_מוקדשרפ.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE9D7FFB2FBE6EEBCA807B6A /* Pods_מוקדשרפ.framework */; };
@@ -38,6 +39,7 @@
 		595F23A225CEFBFE0053416C /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = "מוקד שרפ/AppDelegate.swift"; sourceTree = "<group>"; };
 		595F23A325CEFBFE0053416C /* Printer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Printer.swift; path = "מוקד שרפ/Printer.swift"; sourceTree = "<group>"; };
 		595F23A425CEFBFE0053416C /* WebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WebView.swift; path = "מוקד שרפ/WebView.swift"; sourceTree = "<group>"; };
+		A1B2C3D4E5F6A78900123459 /* LocalAssetHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LocalAssetHandler.swift; path = "מוקד שרפ/LocalAssetHandler.swift"; sourceTree = "<group>"; };
 		BE9D7FFB2FBE6EEBCA807B6A /* Pods_מוקדשרפ.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = "Pods_מוקדשרפ.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEE8E5C625AE96C07F8AADED /* Pods-מוקד שרפ.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-מוקד שרפ.debug.xcconfig"; path = "Target Support Files/Pods-מוקד שרפ/Pods-מוקד שרפ.debug.xcconfig"; sourceTree = "<group>"; };
 		CDC0FE262388222B002C8D56 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = "מוקד שרפ/Base.lproj/Main.storyboard"; sourceTree = "<group>"; };
@@ -89,6 +91,7 @@
 				CDC0FE272388222B002C8D56 /* LaunchScreen.storyboard */,
 				CDC0FE252388222B002C8D56 /* Main.storyboard */,
 				595F23A425CEFBFE0053416C /* WebView.swift */,
+				A1B2C3D4E5F6A78900123459 /* LocalAssetHandler.swift */,
 				A1B2C3D4E5F6A78900123456 /* www */,
 				30FCACC6A7BF53CD6D9CF6C0 /* Pods */,
 				90E46E861CB86F5FAF46BED9 /* Frameworks */,
@@ -222,6 +225,7 @@
 				595F23AC25CEFBFE0053416C /* ViewController.swift in Sources */,
 				595F23AA25CEFBFE0053416C /* PushNotifications.swift in Sources */,
 				595F23AF25CEFBFE0053416C /* WebView.swift in Sources */,
+				A1B2C3D4E5F6A78900123458 /* LocalAssetHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -376,7 +380,7 @@
 				CODE_SIGN_ENTITLEMENTS = "מוקד שרפ/Entitlements/Entitlements.plist";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "מוקד שרפ/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -385,7 +389,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.yanivcarmel.mokadsharap";
 				PRODUCT_NAME = "מוקדשרפ";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -404,7 +408,7 @@
 				CLANG_ENABLE_MODULES = NO;
 				CODE_SIGN_ENTITLEMENTS = "מוקד שרפ/Entitlements/Entitlements.plist";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "מוקד שרפ/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -413,7 +417,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.yanivcarmel.mokadsharap";
 				PRODUCT_NAME = "מוקדשרפ";
 				SUPPORTS_MACCATALYST = YES;
