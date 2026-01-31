@@ -124,34 +124,6 @@ class ViewController: UIViewController, WKNavigationDelegate, UIDocumentInteract
     }
     
     @objc func loadRootUrl() {
-        // Debug: Check if www folder exists
-        let bundle = Bundle.main
-        print("ViewController: Bundle path: \(bundle.bundlePath)")
-
-        if let wwwPath = bundle.path(forResource: "www", ofType: nil) {
-            print("ViewController: www folder found at: \(wwwPath)")
-
-            // List www contents
-            do {
-                let contents = try FileManager.default.contentsOfDirectory(atPath: wwwPath)
-                print("ViewController: www contents: \(contents)")
-            } catch {
-                print("ViewController: Error listing www: \(error)")
-            }
-        } else {
-            print("ViewController: ERROR - www folder NOT FOUND in bundle!")
-
-            // Show alert to user
-            let alert = UIAlertController(
-                title: "Debug Error",
-                message: "www folder not found in app bundle. Please check build configuration.",
-                preferredStyle: .alert
-            )
-            alert.addAction(UIAlertAction(title: "OK", style: .default))
-            self.present(alert, animated: true)
-            return
-        }
-
         // Load bundled www/index.html using custom URL scheme
         // This solves WKWebView CORS issues with file:// protocol
         let url = URL(string: "app://localhost/index.html")!

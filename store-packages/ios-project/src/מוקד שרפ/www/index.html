@@ -11,6 +11,11 @@
       name="description"
       content="התקשרות מיידית למוקד שרפ - שירותי רפואה פרטית"
     />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23dc2626'/%3E%3Cpath d='M12 16c0-2.2 1.8-4 4-4h8c2.2 0 4 1.8 4 4v8c0 2.2-1.8 4-4 4h-8c-2.2 0-4-1.8-4-4v-8z' fill='white'/%3E%3Cpath d='M18 14v12M14 20h12' stroke='%23dc2626' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
 
     <!-- Theme color for browser chrome -->
     <meta name="theme-color" content="#ffffff" />
@@ -21,95 +26,10 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="מוקד שרפ" />
 
-    <style>
-      /* Debug styles */
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-        margin: 0;
-        padding: 20px;
-        background: #f5f5f5;
-      }
-      #debug {
-        background: #fff;
-        border: 2px solid #dc2626;
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 20px;
-        font-size: 14px;
-        direction: ltr;
-        text-align: left;
-      }
-      #debug h3 {
-        margin: 0 0 10px 0;
-        color: #dc2626;
-      }
-      #debug .log {
-        background: #f0f0f0;
-        padding: 5px 10px;
-        margin: 5px 0;
-        border-radius: 4px;
-        font-family: monospace;
-        font-size: 12px;
-        word-break: break-all;
-      }
-      #debug .error {
-        background: #fee;
-        color: #c00;
-      }
-      #debug .success {
-        background: #efe;
-        color: #060;
-      }
-    </style>
+    <script src="./assets/index.js"></script>
   </head>
 
   <body>
-    <div id="debug">
-      <h3>Debug Info</h3>
-      <div id="debug-logs"></div>
-    </div>
     <div id="root"></div>
-
-    <script>
-      // Debug logging
-      var debugEl = document.getElementById("debug-logs");
-      function log(msg, type) {
-        var div = document.createElement("div");
-        div.className = "log " + (type || "");
-        div.textContent = msg;
-        debugEl.appendChild(div);
-        console.log("[DEBUG]", msg);
-      }
-
-      // Capture errors
-      window.onerror = function (msg, url, line, col, error) {
-        log("ERROR: " + msg + " at " + url + ":" + line, "error");
-        return false;
-      };
-
-      log("Page loaded");
-      log("URL: " + window.location.href);
-      log("Protocol: " + window.location.protocol);
-
-      // Try to load the main script
-      log("Loading assets/index.js...");
-
-      var script = document.createElement("script");
-      script.src = "./assets/index.js";
-      script.onload = function () {
-        log("Script loaded successfully!", "success");
-        // Hide debug after 3 seconds if React mounts
-        setTimeout(function () {
-          if (document.getElementById("root").children.length > 0) {
-            document.getElementById("debug").style.display = "none";
-          }
-        }, 3000);
-      };
-      script.onerror = function (e) {
-        log("Script FAILED to load!", "error");
-        log("Error event: " + JSON.stringify(e), "error");
-      };
-      document.body.appendChild(script);
-    </script>
   </body>
 </html>
